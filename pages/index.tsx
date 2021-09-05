@@ -3,9 +3,27 @@ import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import fs from 'fs'
 import path from 'path'
+import moment, { Moment } from 'moment'
+import Clock from '../components/Clock'
 
-export default function Home({files}) {
 
+interface Lines {
+  lines: Line
+}
+interface Line {
+  time: Moment
+  author: string
+  text: string
+  map: any
+}
+
+interface Chats {
+  texts: Array<string>;
+  images: Array<string>;
+  videos: Array<string>;
+}
+
+export default function Home({lines}: Lines) {
   return (
     <div className={styles.container}>
       <Head>
@@ -16,7 +34,8 @@ export default function Home({files}) {
 
       <main className={styles.main}>
         <h1 className={styles.title}>
-          Welcome to <a href="wüebos">Wüebos</a>
+          <Clock />
+          <span>Welcome to <a href="wüebos">Wüebos</a></span>
         </h1>
         <p className={styles.description}>
           This system will help you read your email backup of Whatsapp conversations, text and images files,
@@ -27,8 +46,20 @@ export default function Home({files}) {
             <div className={styles.card}>
               <h2>Load your zip file to create a conversation</h2>
               <p>Use the zip file as downloaded from your email conversation</p>
-              <img className={styles.logo} src="wüebos.png" />
+              <div className={styles.logo} >
+                <Image alt="wüebos"src="/wüebos.png" height="50rem" width="50rem"/>
+              </div>
             </div>
+        </div>
+        <div className={styles.grid}>
+          <h2>Conversation:</h2>
+          {lines.map((line: Line, index: number) => (
+            <div key={`line-${index}`} className={styles.card}>
+              {line.author}:
+              <br />
+              {line.text}
+            </div>
+          ))}
         </div>
       </main>
 
@@ -46,65 +77,57 @@ export default function Home({files}) {
 }
 
 export async function getStaticProps() {
-  const postsDirectory = path.join(process.cwd(), 'chat')
-  const filenames = fs.readdirSync(postsDirectory)
-
-
-  const texts: Array<string>= filenames.filter(file => {
-    const extension = file.split(".")[1]
-    console.log('extension', extension)
-    return extension === "txt"
-  })
-
-  const images: Array<string>= filenames.filter(file => {
-    const extension = file.split(".")[1]
-    console.log('extension', extension)
-    return ["png", "jpg", "webp", "opus"].includes(extension)
-  })
-
-
-  const videos: Array<string>= filenames.filter(file => {
-    const extension = file.split(".")[1]
-    console.log('extension', extension)
-    return ["mp4"].includes(extension)
-  })
-
-  console.log('texts', texts)
-  console.log('images', images)
-  console.log('videos', videos)
-
-  const files = {
-    texts: [],
-    images: [],
-    videos: [],
-  }
-
-  filenames.forEach(file => {
-    const extension = file.split(".")[1]
-    if (["txt"].includes(extension)) files.texts.push(file)
-    if (["png", "jpg", "webp", "opus"].includes(extension)) files.images.push(file)
-    if (["mp4"].includes(extension)) files.videos.push(file)
-  });
-
-  console.log('files', files)
-
-  // const posts = filenames.map(filename => {
-  //   const filePath = path.join(postsDirectory, filename)
-  //   const fileContents = fs.readFileSync(filePath, 'utf8')
-
-  //   // Generally you would parse/transform the contents
-  //   // For example you can transform markdown to HTML here
-
-  //   return {
-  //     filename,
-  //     content: fileContents,
-  //   }
-  // })
-  // By returning { props: posts }, the Blog component
-  // will receive `posts` as a prop at build time
-  return {
-    props: {
-      files,
-    },
+  try {
+    const postsDirectory = path.join(process.cwd(), 'example')
+    const filenames = fs.readdirSync(postsDirectory)
+    
+    const files: Chats = {
+      texts: [],
+      images: [],
+      videos: [],
+    }
+  
+    filenames.forEach(file => {
+      const extension = file.split(".")[1]
+      if (["txt"].includes(extension)) files.texts.push(file)
+      if (["png", "jpg", "webp", "opus"].includes(extension)) files.images.push(file)
+      if (["mp4"].includes(extension)) files.videos.push(file)
+    });
+  
+    const rawRows = fs.readFileSync(`example/${files.texts[0]}`).toString().split("\n")
+  
+    const lines = rawRows.map(line => {
+      const splitLine = line.split("-")
+      if (splitLine.length === 1) {
+        return {
+          "text": splitLine[0],
+        }
+      } else {
+        const time = moment(splitLine[0].trim(), 'M/D/YY, H:mm a').format('YYYY-MM-DD')
+        splitLine.shift()
+        const content = [...splitLine.map(l => l.trim())].join(" ").split(":")
+        const author = content[0]
+        content.shift()
+        const text = [...content].join(" ").trim()
+        return {
+          time: time,
+          author: author,
+          text: text,
+        }
+      }
+    })
+    .filter(line => line.text !== "")
+    
+    return {
+      props: {
+        lines,
+      },
+    }
+  } catch (error) {
+    return {
+      props: {
+        lines: [],
+      }
+    }
   }
 }

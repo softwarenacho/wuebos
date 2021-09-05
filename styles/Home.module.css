@@ -1,11 +1,9 @@
 .container {
-  min-height: 100vh;
   padding: 0 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
 }
 
 .main {
@@ -31,6 +29,13 @@
   justify-content: center;
   align-items: center;
   flex-grow: 1;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .title a {
@@ -79,7 +84,7 @@
   border: 1px solid #eaeaea;
   border-radius: 10px;
   transition: color 0.15s ease, border-color 0.15s ease;
-  width: 45%;
+  width: 100%;
 }
 
 .card:hover,
@@ -101,7 +106,6 @@
 }
 
 .logo {
-  height: 5em;
   margin-top: 1rem;
 }
 
