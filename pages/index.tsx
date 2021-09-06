@@ -24,6 +24,8 @@ interface Chats {
 }
 
 export default function Home({lines}: Lines) {
+  const authors = lines.map((line: Line) => line.author)
+
   return (
     <div className={styles.container}>
       <Head>
@@ -54,10 +56,22 @@ export default function Home({lines}: Lines) {
         <div className={styles.grid}>
           <h2>Conversation:</h2>
           {lines.map((line: Line, index: number) => (
-            <div key={`line-${index}`} className={styles.card}>
-              {line.author}:
-              <br />
-              {line.text}
+            <div 
+              key={`line-${index}`}
+              className={`
+                ${styles.card} 
+                ${line.author === authors[0] ? styles.left : styles.right} 
+                ${line.author !== lines[index -1]?.author ? styles.first : styles.notFirst}
+              `}>
+              <span className={styles.text}>
+                {line.text}
+              </span>
+              <span className={styles.author}>
+                {line.author}
+              </span>
+              <span className={styles.time}>
+                {line.time}
+              </span>
             </div>
           ))}
         </div>
@@ -103,7 +117,7 @@ export async function getStaticProps() {
           "text": splitLine[0],
         }
       } else {
-        const time = moment(splitLine[0].trim(), 'M/D/YY, H:mm a').format('YYYY-MM-DD')
+        const time = moment(splitLine[0].trim(), 'M/D/YY, H:mm a').format('YYYY-MM-DD - HH:mm')
         splitLine.shift()
         const content = [...splitLine.map(l => l.trim())].join(" ").split(":")
         const author = content[0]

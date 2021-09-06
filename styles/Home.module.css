@@ -69,29 +69,80 @@
 
 .grid {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
   max-width: 800px;
   margin-top: 3rem;
+  background-color: #99cc99;
+  position: relative;
 }
 
 .card {
   margin: 1rem;
-  padding: 1.5rem;
-  color: inherit;
+  padding: 2rem;
   text-decoration: none;
-  border: 1px solid #eaeaea;
-  border-radius: 10px;
-  transition: color 0.15s ease, border-color 0.15s ease;
-  width: 100%;
+  border-radius: 0.5rem;
+  border: 0.1rem solid white;
+  line-height: 1.25rem;
+  color: white;
+  min-width: 60%;
+  max-width: 90%;
+  position: relative;
+}
+
+.left {
+  text-align: left;
+  background-color: #262d31;
+  align-self: flex-start;
+}
+
+.right {
+  text-align: right;
+  background-color: #056162;
+  align-self: flex-end;
+}
+
+
+.first {
+  margin-bottom: 0.25rem;
+}
+
+.notFirst {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
 }
 
 .card:hover,
 .card:focus,
 .card:active {
-  color: #0070f3;
-  border-color: #0070f3;
+  font-weight: 700;
+}
+
+.card .author, .card .time {    
+  font-weight: 100;
+  position: absolute;
+  font-size: 0.9rem;
+}
+
+.card .author {    
+  top: 0.5rem;
+}
+
+.card .time {    
+  bottom: 0.5rem;
+}
+
+.card.left .author, .card.left .time {    
+  right: 0.5rem;
+}
+
+.card.right .author, .card.right .time {    
+  left: 0.5rem;
+}
+
+.card .text {
+  font-weight: 400;
 }
 
 .card h2 {
